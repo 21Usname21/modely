@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tesla Sesli Sipariş ve Öneri Asistanı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f3f4f6;
+      max-width: 750px;
+      margin: auto;
+    }
+    textarea, select, input, button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+    button {
+      background-color: #2563eb;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+    #responseBox, #summaryBox {
+      margin-top: 20px;
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 5px #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🚗 Tesla Sesli Sipariş & Yapay Zeka Öneri</h2>
+
+  <button onclick="startListening()">🎤 Sesli Komutla Doldur</button>
+  <div id="response">🔊 Ses bekleniyor...</div>
+
+  <form id="teslaForm">
+    <label>Model</label>
+    <select id="model">
+      <option value="long_range">Uzun Menzil</option>
+      <option value="performance">Performance</option>
+    </select>
+
+    <label>Renk</label>
+    <select id="paint">
+      <option value="white">Beyaz</option>
+      <option value="black">Siyah</option>
+      <option value="gray">Gri</option>
+    </select>
+
+    <label>Jant</label>
+    <select id="wheels">
+      <option value="19">19 inç</option>
+      <option value="20">20 inç</option>
+    </select>
+
+    <label>İç Tasarım</label>
+    <select id="interior">
+      <option value="black">Siyah</option>
+      <option value="white">Beyaz</option>
+    </select>
+
+    <label>Otomatik Pilot</label>
+    <select id="autopilot">
+      <option value="no">Hayır</option>
+      <option value="yes">Evet</option>
+    </select>
+  </form>
+
+  <button onclick="showSummary()">📋 Seçim Özeti Göster</button>
+  <div id="summaryBox" style="display:none;"></div>
+
+  <hr>
+
+  <h3>💡 Otomatik Öneri (Yaz veya Konuş)</h3>
+  <textarea id="input" rows="3" placeholder="Örnek: Şehir içi kullanım, konfor, bütçe 2.5 milyon TL"></textarea>
+  <button onclick="makeSuggestion()">🤖 Öneri Al</button>
+  <div id="responseBox" style="display:none;"></div>
+
+  <div style="margin-top: 30px; text-align: center;">
+    <a href="https://www.tesla.com/tr_tr/modely/design" target="_blank">
+      <button style="background-color:#16a34a;">🚀 Tesla Türkiye Resmi Sitesine Git</button>
+    </a>
+  </div>
+
+  <script>
+    function startListening() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "tr-TR";
+      recognition.start();
+
+      document.getElementById("response").innerText = "🎤 Dinleniyor...";
+
+      recognition.onresult = function (event) {
+        const text = event.results[0][0].transcript.toLowerCase();
+        document.getElementById("response").innerText = "✅ Algılanan: " + text;
+
+        if (text.includes("performance")) document.getElementById("model").value = "performance";
+        if (text.includes("uzun menzil")) document.getElementById("model").value = "long_range";
+
+        if (text.includes("beyaz")) document.getElementById("paint").value = "white";
+        if (text.includes("siyah")) document.getElementById("paint").value = "black";
+        if (text.includes("gri")) document.getElementById("paint").value = "gray";
+
+        if (text.includes("19")) document.getElementById("wheels").value = "19";
+        if (text.includes("20")) document.getElementById("wheels").value = "20";
+
+        if (text.includes("iç beyaz")) document.getElementById("interior").value = "white";
+        if (text.includes("iç siyah")) document.getElementById("interior").value = "black";
+
+        if (text.includes("otomatik pilot evet")) document.getElementById("autopilot").value = "yes";
+        if (text.includes("otomatik pilot hayır")) document.getElementById("autopilot").value = "no";
+
+        showSummary();
+      };
+    }
+
+    function showSummary() {
+      const m = document.getElementById("model").selectedOptions[0].text;
+      const p = document.getElementById("paint").selectedOptions[0].text;
+      const w = document.getElementById("wheels").selectedOptions[0].text;
+      const i = document.getElementById("interior").selectedOptions[0].text;
+      const a = document.getElementById("autopilot").selectedOptions[0].text;
+
+      const summary = `
+        <h4>📋 Seçim Özeti</h4>
+        <ul>
+          <li><strong>Model:</strong> ${m}</li>
+          <li><strong>Renk:</strong> ${p}</li>
+          <li><strong>Jant:</strong> ${w}</li>
+          <li><strong>İç Mekan:</strong> ${i}</li>
+          <li><strong>Oto Pilot:</strong> ${a}</li>
+        </ul>
+      `;
+
+      document.getElementById("summaryBox").innerHTML = summary;
+      document.getElementById("summaryBox").style.display = "block";
+    }
+
+    function makeSuggestion() {
+      const text = document.getElementById("input").value.toLowerCase();
+      const responseBox = document.getElementById("responseBox");
+      let response = "";
+
+      if (text.includes("şehir içi") || text.includes("konfor")) {
+        response += `✅ Öneri:
+- Model: Uzun Menzil
+- Jant: 19 inç
+- İç: Siyah
+- Oto Pilot: Hayır
+➡️ Tahmini Fiyat: 2.3M TL\n\n`;
+      }
+
+      if (text.includes("performans") || text.includes("hız")) {
+        response += `🏎️ Hız Tutkunlarına:
+- Model: Performance
+- Jant: 20 inç
+- İç: Beyaz
+- Oto Pilot: Evet
+➡️ Tahmini Fiyat: 2.7M TL\n\n`;
+      }
+
+      if (text.includes("bütçe") && text.includes("2.5")) {
+        response += `💰 Bütçe notu: 2.5M TL civarına Uzun Menzil + premium jantlar uygundur.`;
+      }
+
+      responseBox.innerText = response || "😕 Uygun öneri bulunamadı. Daha fazla bilgi verin.";
+      responseBox.style.display = "block";
+    }
+  </script>
+
+</body>
+</html>
